@@ -20,45 +20,23 @@ This system implements a sophisticated payment processing platform that can inte
 - Ensures fair distribution over time
 - Best for predictable traffic patterns
 
-#### 2. **Weighted Random**
-- Randomly selects banks based on weight probability
-- Good for varying traffic patterns
-- Provides natural load balancing
-
-#### 3. **Least Connections**
-- Routes to bank with fewest active connections
-- Accounts for bank processing capacity
-- Optimal for real-time load balancing
-
-#### 4. **Health-Based Distribution**  
-- Routes based on bank health metrics
-- Automatically avoids underperforming banks
-- Adaptive to real-time conditions
-
-### 📊 Traffic Analytics & Monitoring
-
-- **Real-time Distribution Tracking**: Monitor how traffic is distributed across banks
-- **Performance Analytics**: Track success rates, processing times, and throughput
-- **Intelligent Recommendations**: Get optimal weight suggestions based on performance
-- **Bank Performance Metrics**: Detailed analytics for each banking partner
-
 ### 💳 Payment Method Support
 
 #### Credit/Debit Cards
 ```csharp
-var request = PaymentRequestFactory.CreateCreditCardPayment(
+var request = ICICICreditCardPayment(
     "CLIENT_001", 1500.50m, "4111111111111111", "12/25", "123", "John Doe");
 ```
 
 #### UPI Payments
 ```csharp  
-var request = PaymentRequestFactory.CreateUPIPayment(
+var request = ICICIUPIPayment(
     "CLIENT_002", 750.75m, "user@paytm");
 ```
 
 #### Net Banking
 ```csharp
-var request = PaymentRequestFactory.CreateNetBankingPayment(
+var request = ICICINetBankingPayment(
     "CLIENT_001", 2000.00m, "username", "password");
 ```
 
@@ -68,79 +46,90 @@ var request = PaymentRequestFactory.CreateNetBankingPayment(
 
 1. **PaymentGateway**: Main orchestration service
 2. **BankRouter**: Intelligent traffic distribution engine  
-3. **BankAdapters**: Bank-specific payment processors
-4. **TrafficAnalyzer**: Performance monitoring and analytics
+3. **BankService**: Bank-specific payment processors
 5. **PaymentHandlers**: Payment method specific processors
 
 ### Traffic Distribution Flow
 
 ```
-Payment Request → PaymentGateway → BankRouter → BankAdapter → PaymentHandler → Bank Response
-                       ↓
-                 Traffic Analytics ← Performance Metrics
+Payment Request → PaymentGateway → BankRouter → BankService → PaymentHandler → Bank Response
+                       
 ```
 
 ## Configuration Example
 
-```csharp
+```java
 
-interface IBankAdapter {
-    IPaymentResponse HandlePayment(IPaymentRequest request);
+public interface  IBankService {
+    PaymentResponse ExecutePayment(IPaymentRequest request);
+    Bank getBank(); // Each service knows which bank it represents
 }
 
-interface IPaymentHandler{
-    IPaymentResponse Handle(IPaymentRequest request);
+public interface  IPaymentHandlerService {
+    Bank getBank();
+    PaymentType getPaymentType();
+    PaymentResponse Payment(IPaymentRequest request);
 }
 
-public class HdfcCreditCardPaymentHandler : IPaymentHandler{
-    CreditCardPaymentResponse Handle(CreditCardPaymentRequest request){
+
+public class HdfcCreditCardPaymentHandler : IPaymentHandlerService{
+    PaymentResponse Handle(HdfcCreditCardPaymentRequest request){
 
     }
 }
 
-public class HdfNetbankingPaymentHandler : IPaymentHandler{
-    NetbankingPaymentResponse Handle(NetbankingPaymentRequest request){
+public class HdfNetbankingPaymentHandler : IPaymentHandlerService{
+    PaymentResponse Handle(HdfcNetbankingPaymentRequest request){
 
     }
 }
 
 
-public class HdfcBankAdapter : IBankAdapter{
-    Dictionary<PaymentType, IPaymentHandler> handlerMap = new Dictionary<PaymentType, IPaymentHandler>();
-    public HdfcBankAdapter(){
-        handleMap = new Dictionary<PaymentType, IPaymentHandler>(){
-            {PaymentType.CreditCard, new HdfcCreditCardPaymentHandler()},
-            {PaymentType.Netbanking, new HdfNetbankingPaymentHandler()}
-        };
+public class HdfcBankService implements IBankService {
+
+    Map<PaymentType, IPaymentHandlerService> paymentHandlereMap;
+
+    public HdfcBankService(
+        @Qualifier("hdfcPaymentHandlerMap")
+        Map<PaymentType, IPaymentHandlerService> paymentHandlereMap){
+        this.paymentHandlereMap = paymentHandlereMap;
     }
-    public IPaymentResponse HandlePayment(IPaymentRequest request){
-        var handler = handlerMap[request.Type];
-        return handler.Handle(reqest);
+
+    @Override
+    public PaymentResponse ExecutePayment(IPaymentRequest request) {
+        IPaymentHandlerService paymentHandler = paymentHandlereMap.get(request.getPaymentType());
+        return paymentHandler.Payment(request);
     }
+
+    @Override
+    public Bank getBank() {
+        return Bank.HDFC;
+    }
+
 }
+
 
 public interface IBankRouter{
-    public IBankAdapter Route(IPaymentRequest request);
+    public Bank Route(IPaymentRequest request);
 }
 
 public class BankConfig{
-    public string BankName {get; set;}
+    public Bank BankName {get; set;}
     public string Weight {get; set;}
 }
 
 public class BankRouter{
     var configMap = new Dictionary<string, int>();
-    public BankRouter(List<BankConfig> configs){
+    Map<Bank, IBankService> banks;
+    public BankRouter(Map<Bank, IBankService> banks, List<BankConfig> configs){
         foreach(var config in configs){
             configMap[config.BankNam] = config.Weight;
         }
     }
     int requestCount = 0;
 
-    public IBankAdapter Route(IPaymentRequest request){
-        router++;
+    public Bank Route(IPaymentRequest request){
+        return Bank.HDFC;
     }
 }
-
-
 ```
