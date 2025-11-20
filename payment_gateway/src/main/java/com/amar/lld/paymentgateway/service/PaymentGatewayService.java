@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 import com.amar.lld.paymentgateway.models.*;
+import com.amar.lld.paymentgateway.models.PaymentResponse;
 import com.amar.lld.paymentgateway.repository.IMerchantRepository;
 import com.amar.lld.paymentgateway.router.IBankRouter;
 
@@ -23,15 +24,14 @@ public class PaymentGatewayService implements IPaymentGatewayService{
     }
     
     @Override
-    public boolean Register(Merchant merchant) {
-        _repository.addMerchant(merchant);
-        return true;
+    public String Register(Merchant merchant) {
+        return _repository.addMerchant(merchant);
     }
 
     @Override
-    public PaymentResponse ExecutePayment(IPaymentRequest request) {
+    public PaymentResponse ExecutePayment(PaymentGatewayRequest request) {
        // Use BankRouter for load balancing
-       Bank selectedBank = bankRouter.getNextBank(request.getPaymentType());
+       Bank selectedBank = bankRouter.getNextBank(request.paymentType());
        System.out.println("Routing payment to: " + selectedBank);
        return bankServices.get(selectedBank).ExecutePayment(request);
     }

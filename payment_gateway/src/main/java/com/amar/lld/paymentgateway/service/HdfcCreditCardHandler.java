@@ -19,8 +19,8 @@ public class HdfcCreditCardHandler implements IPaymentHandlerService{
         this.mapper = mapper;
     }
     @Override
-    public PaymentResponse Payment(IPaymentRequest request) {
-        HdfcCreditCardPaymentRequest paymentRequest = mapper.convertValue(request, HdfcCreditCardPaymentRequest.class);
+    public PaymentResponse Payment(PaymentGatewayRequest request) {
+        HdfcCreditCardPaymentRequest paymentRequest = mapper.convertValue(request.paymentDetails(), HdfcCreditCardPaymentRequest.class);
         hdfcClient.HandleCreditCardPayment(paymentRequest);
         System.out.println("HdfcCreditCardHandler.Payment() has been processed successfully");
         String transactionId = String.format("trx_{}_success_{}", Bank.HDFC, LocalDate.now().toString());

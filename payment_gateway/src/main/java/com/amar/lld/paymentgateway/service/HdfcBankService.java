@@ -19,11 +19,11 @@ public class HdfcBankService implements IBankService {
     }
 
     @Override
-    public PaymentResponse ExecutePayment(IPaymentRequest request) {
-        IPaymentHandlerService paymentHandler = paymentHandlereMap.get(request.getPaymentType());
+    public PaymentResponse ExecutePayment(PaymentGatewayRequest request) {
+        IPaymentHandlerService paymentHandler = paymentHandlereMap.get(request.paymentType());
         
         if (paymentHandler == null) {
-            throw new IllegalArgumentException("No handler found for payment type: " + request.getPaymentType());
+            throw new IllegalArgumentException("No handler found for payment type: " + request.paymentType());
         }
         return paymentHandler.Payment(request);
     }

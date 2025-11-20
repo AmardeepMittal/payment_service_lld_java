@@ -5,8 +5,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.amar.lld.paymentgateway.models.IPaymentRequest;
 import com.amar.lld.paymentgateway.models.Merchant;
+import com.amar.lld.paymentgateway.models.PaymentGatewayRequest;
 import com.amar.lld.paymentgateway.models.PaymentResponse;
 import com.amar.lld.paymentgateway.service.IPaymentGatewayService;
 
@@ -22,12 +22,12 @@ public class PaymentGatewayController{
     }
 
     @PostMapping("/register")
-    public boolean Register(@RequestBody Merchant merchant){
+    public String Register(@RequestBody Merchant merchant){
         return _paymentGateway.Register(merchant);
     }
 
     @PostMapping("/execute")
-    public PaymentResponse ExecutePayment(@RequestBody IPaymentRequest request){
+    public PaymentResponse ExecutePayment(@RequestBody PaymentGatewayRequest request){
         return _paymentGateway.ExecutePayment(request);
     }
 }

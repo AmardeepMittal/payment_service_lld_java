@@ -5,5 +5,5 @@ import com.amar.lld.paymentgateway.models.*;
 public interface  IPaymentHandlerService {
     Bank getBank();
     PaymentType getPaymentType();
-    PaymentResponse Payment(IPaymentRequest request);
+    PaymentResponse Payment(PaymentGatewayRequest request);
 }

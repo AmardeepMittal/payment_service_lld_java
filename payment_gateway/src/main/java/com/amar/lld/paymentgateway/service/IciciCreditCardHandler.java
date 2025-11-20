@@ -19,8 +19,8 @@ public class IciciCreditCardHandler implements IPaymentHandlerService{
     }
 
     @Override
-    public PaymentResponse Payment(IPaymentRequest request) {
-        IciciCreditCardPaymentRequest paymentRequest = mapper.convertValue(request, IciciCreditCardPaymentRequest.class);
+    public PaymentResponse Payment(PaymentGatewayRequest request) {
+        IciciCreditCardPaymentRequest paymentRequest = mapper.convertValue(request.paymentDetails(), IciciCreditCardPaymentRequest.class);
         System.out.println("Credit card payment has been successful");
         client.HandleCreditCardPayment(paymentRequest);
         String transactionId = String.format("trx_{}_success_{}", Bank.ICICI, LocalDate.now().toString());

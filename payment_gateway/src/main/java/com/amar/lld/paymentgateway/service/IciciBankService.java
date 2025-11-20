@@ -19,8 +19,8 @@ public class IciciBankService implements IBankService {
     }
 
     @Override
-    public PaymentResponse ExecutePayment(IPaymentRequest request) {
-        IPaymentHandlerService handler = paymentHandlers.get(request.getPaymentType());
+    public PaymentResponse ExecutePayment(PaymentGatewayRequest request) {
+        IPaymentHandlerService handler = paymentHandlers.get(request.paymentType());
         return handler.Payment(request);
     }
 

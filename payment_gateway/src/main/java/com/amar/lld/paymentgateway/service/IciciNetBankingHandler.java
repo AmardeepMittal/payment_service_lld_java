@@ -19,8 +19,8 @@ public class IciciNetBankingHandler implements IPaymentHandlerService {
     }
 
     @Override
-    public PaymentResponse Payment(IPaymentRequest request) {
-        IciciNetBankingPaymentRequest paymentRequest = mapper.convertValue(request, IciciNetBankingPaymentRequest.class);
+    public PaymentResponse Payment(PaymentGatewayRequest request) {
+        IciciNetBankingPaymentRequest paymentRequest = mapper.convertValue(request.paymentDetails(), IciciNetBankingPaymentRequest.class);
         System.out.println("ICICI net banking has been successful");
         client.HandleNetBankingPayment(paymentRequest);
         String transactionId = String.format("trx_{}_success_{}", Bank.ICICI, LocalDate.now().toString());

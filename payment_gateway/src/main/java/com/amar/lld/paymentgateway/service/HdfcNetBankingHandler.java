@@ -19,8 +19,8 @@ public class HdfcNetBankingHandler implements IPaymentHandlerService {
     }
 
     @Override
-    public PaymentResponse Payment(IPaymentRequest request) {
-        HdfcNetBankingPaymentRequest paymentRequest = mapper.convertValue(request, HdfcNetBankingPaymentRequest.class);
+    public PaymentResponse Payment(PaymentGatewayRequest request) {
+        HdfcNetBankingPaymentRequest paymentRequest = mapper.convertValue(request.paymentDetails(), HdfcNetBankingPaymentRequest.class);
         System.out.println("Net banking payment is successful");
         
         hdfcClient.HandleNetBankingPayment(paymentRequest);

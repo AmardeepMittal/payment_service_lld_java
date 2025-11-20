@@ -6,7 +6,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import com.amar.lld.paymentgateway.models.Merchant;
+import com.amar.lld.paymentgateway.models.PaymentGatewayRequest;
 import com.amar.lld.paymentgateway.models.PaymentResponse;
+import com.amar.lld.paymentgateway.models.PaymentType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -15,6 +17,7 @@ public class PaymentGatewayDemo implements CommandLineRunner {
 
     private final RestTemplate restTemplate;
     private static final String BASE_URL = "http://localhost:8080/api/payment";
+    private String merchantId = "MERCH001";
 
     public PaymentGatewayDemo(RestTemplateBuilder restTemplateBuilder) {
         this.restTemplate = restTemplateBuilder.build();
@@ -52,9 +55,9 @@ public class PaymentGatewayDemo implements CommandLineRunner {
             Merchant merchant = new Merchant("MERCH001", "Test Merchant", "merchant@test.com", "E-commerce");
             
             String url = BASE_URL + "/register";
-            Boolean response = restTemplate.postForObject(url, merchant, Boolean.class);
-            
-            System.out.println("Merchant Registration: " + (response ? "SUCCESS" : "FAILED"));
+            String response = restTemplate.postForObject(url, merchant, String.class);
+            this.merchantId = response;
+            System.out.println("Merchant Registration: " + (response != null ? "SUCCESS" : "FAILED"));
             System.out.println();
         } catch (Exception e) {
             System.err.println("Failed to register merchant: " + e.getMessage());
@@ -86,8 +89,10 @@ public class PaymentGatewayDemo implements CommandLineRunner {
             jsonObject.put("expiryYear", "2025");
             jsonObject.put("cvv", "123");   
             
+            var request = new PaymentGatewayRequest(merchantId, PaymentType.CREDIT_CARD, jsonObject);
+
             String url = BASE_URL + "/execute";
-            PaymentResponse response = restTemplate.postForObject(url, jsonObject, PaymentResponse.class);
+            PaymentResponse response = restTemplate.postForObject(url, request, PaymentResponse.class);
             
             if (response != null) {
                 System.out.println("  - Amount: $" + amount);
