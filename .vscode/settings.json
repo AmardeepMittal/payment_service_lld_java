@@ -1,0 +1,20 @@
+{
+    "markdown.preview.fontSize": 16,
+    "markdown.styles": [
+        ".vscode/markdown.css"
+    ],
+    "markdown.preview.doubleClickToSwitchToEditor": false,
+    "markdown.preview.markEditorSelection": false,
+    "markdown.preview.scrollPreviewWithEditor": false,
+    "markdown.preview.scrollEditorWithPreview": false,
+    "markdown.preview.syncPreviewSelectionWithEditor": false,
+    "markdown.preview.typographer": false,
+    "security.workspace.trust.untrustedFiles": "open",
+    "markdown.preview.openMarkdownLinks": "inPreview",
+    "markdown.preview.openMarkdownFilesAutomatically": true,
+    "workbench.editor.enablePreview": true,
+    "workbench.editorAssociations": {
+    "*.md": "vscode.markdown.preview.editor"
+  },
+  "java.compile.nullAnalysis.mode": "disabled"
+}
